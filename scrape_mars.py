@@ -89,6 +89,33 @@ def scrape_info():
     mars_facts_html = mars_facts.to_html(classes="table table-striped")
     mars_data["mars_facts_html"] = mars_facts_html
 
+    # Scrap Mars Hemisphere data
+    url = 'https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars'
+    browser.visit(url)
+    time.sleep(5)
+
+    # Scrape page into Soup
+    html = browser.html
+    soup = bs(html, "html.parser")
+
+    xpath = '//div[@class="description"]//a[@class="itemLink product-item"]/h3'
+    results = browser.find_by_xpath(xpath)
+
+    hemisphere_img_results = []
+
+    for i in range(4):
+        html = browser.html
+        # Parse HTML with Beautiful Soup
+        soup = BeautifulSoup(html, 'html.parser')
+        results = browser.find_by_xpath(xpath)
+        img_header = results[i].html
+    
+        scrape_url = results[i]
+        scrape_url.click()
+        html = browser.html
+        soup = BeautifulSoup(html, 'html.parser')
+        hemisphere_img_results.append({"title": img_header, "image_url": soup.find("div", class_='downloads').a['href']})
+
     
     # Close the browser after scraping
     browser.quit()
